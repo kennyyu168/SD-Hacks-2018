@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">  
+    <title style = "float-left">Ez-Read</title>
+      <meta charset="utf-8" />
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="#">Ez-Read</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <button id="authorize_button" onClick="myContinue()" class="btn mr-3 btn-primary" href="#" type="button"> Authorize <span class="sr-only">(current)</span></button>
+            <button  id="continue" onClick="mySignIn(); nextButton(); disabled=true;" class="btn mr-2  btn-outline-success" href="#" type="button"> View important statements <span class="sr-only">(current)</span></button>
+              <button id="docuSign_button" style="display: none;" class="btn btn-outline-secondary" type="button"><a href="http://localhost:3000">Continue to your DocuSign</a></button>        
+            <button id="signout_button" class=" btn btn-outline-secondary ml-5" href="#" type="button">Sign Out</button>
+          </div>
+        </div>
+      </nav>
+      
+  <pre class="mx-auto" id="content"></pre>
+      
+    <script type="text/javascript">
+      // Client ID and API key from the Developer Console
+      var CLIENT_ID = '651854892275-fpcbpok5gifupgpanm7pri2up92iqipp.apps.googleusercontent.com';
+      var API_KEY = 'AIzaSyDHlIn3EKhXJQpMRQCMLPYmOi56A8CwA1w';
+
+      // Array of API discovery doc URLs for APIs used by the quickstart
+      var DISCOVERY_DOCS = ["https://www.googleapis.com/discovery/v1/apis/gmail/v1/rest"];
+
+      // Authorization scopes required by the API; multiple scopes can be
+      // included, separated by spaces.
+      var SCOPES = 'https://www.googleapis.com/auth/gmail.readonly';
+
+      var authorizeButton = document.getElementById('authorize_button');
+      var signoutButton = document.getElementById('signout_button');
+      var continueButton = document.getElementById('continue');
+      var docuSignButton = document.getElementById('docuSign_button')
+      /**
+       *  On load, called to load the auth2 library and API client library.
+       */
+      function handleClientLoad() {
+        gapi.load('client:auth2', initClient);
+      }
+
+      /**
+       *  Initializes the API client library and sets up sign-in state
+       *  listeners.
+       */
+      function initClient() {
+        gapi.client.init({
+          apiKey: API_KEY,
+          clientId: CLIENT_ID,
+          discoveryDocs: DISCOVERY_DOCS,
+          scope: SCOPES
+        }).then(function () {
+          // Listen for sign-in state changes.
+          gapi.auth2.getAuthInstance().isSignedIn.listen(updateSigninStatus);
+
+          // Handle the initial sign-in state.
+          updateSigninStatus(gapi.auth2.getAuthInstance().isSignedIn.get());
+          authorizeButton.onclick = handleAuthClick;
+          signoutButton.onclick = handleSignoutClick;
+        });
+      }
+
+      /**
+       *  Called when the signed in status changes, to update the UI
+       *  appropriately. After a sign-in, the API is called.
+       */
+      function updateSigninStatus(isSignedIn) {
+          if (isSignedIn) {
+          authorizeButton.style.display = 'none';
+          signoutButton.style.display = 'block';
+          continueButton.style.display = 'block';
+        } else {
+          authorizeButton.style.display = 'block';
+          signoutButton.style.display = 'none';
+          continueButton.style.display = 'none';
+        }
+      }
+
+      /**
+       *  Sign in the user upon button click.
+       */
+      function handleAuthClick(event) {
+        gapi.auth2.getAuthInstance().signIn();
+      }
+      </script>
+      
+      <!-- reveals hidden iframe -->
+      <div id="my-div" style="display:none">
+      <iframe src="http://docs.google.com/gview?url=https://media.termsfeed.com/pdf/terms-and-conditions-template.pdf&embedded=true" style="width:1660px; height:970px;" frameborder="0"></iframe>
+      </div>
+      
+      
+      <script>
+      //alert popup
+      function nextButton() {
+          alert('The sender of this document would like you to read the following closely. You may proceed after 30 seconds:');
+          setTimeout(function(){alert('You may now proceed to DocuSign');}, 30000);
+          setTimeout(function(){docuSignButton.style.display = 'block';}, 30000);
+          
+      }
+          
+      //function to hide/unhide the iframe before authorization
+      function mySignIn() {
+        var x = document.getElementById("my-div");
+        if (x.style.display === "none") {
+          x.style.display = "block";
+        } else {
+          x.style.display = "none";
+        }
+      }    
+      //funtion to hide/unhide the continue button
+      function myContinue() {
+        var y = document.getElementById("continue");
+        if (y.style.display === "none") {
+          y.style.display = "block";
+        } else {
+          y.style.display = "none";
+        }
+      }
+      /**
+       *  Sign out the user upon button click.
+       */
+      function handleSignoutClick(event) {
+        gapi.auth2.getAuthInstance().signOut();
+      }
+
+      /**
+       * Append a pre element to the body containing the given message
+       * as its text node. Used to display the results of the API call.
+       *
+       * @param {string} message Text to be placed in pre element.
+       */
+      function appendPre(message) {
+        var pre = document.getElementById('content');
+        var textContent = document.createTextNode(message + '\n');
+        pre.appendChild(textContent);
+      }
+
+        
+    </script>
+    <script async defer src="https://apis.google.com/js/api.js"
+      onload="this.onload=function(){};handleClientLoad()"
+      onreadystatechange="if (this.readyState === 'complete') this.onload()">
+    </script>
+    <iframe src="https://demo.docusign.net/signing/emails/v2-c76b390f6f8a4c7b824b7cc0ff1a73cdedffca612f54485a912c6960c473f229833ad4264e304c03904957c725c422f1" class="mx-auto" style="border:1px; width:100%;"></iframe>
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+  </body>
+</html>
